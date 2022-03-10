@@ -1,0 +1,113 @@
+
+Pour crëer un socket
+
+#include <sys/socket.h>
+...
+...
+if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+{
+    perror(“cannot create socket”);
+    return 0;
+}
+
+Pour bind le socket (lui transmettre les informations du port a utiliser, adresse IP de son PC ...)
+
+#include <sys/socket.h>
+…
+struct sockaddr_in address;
+const int PORT = 8080; //Where the clients can reach at
+/* htonl converts a long integer (e.g. address) to a network representation */
+/* htons converts a short integer (e.g. port) to a network representation */
+memset((char *)&address, 0, sizeof(address));
+address.sin_family = AF_INET;
+address.sin_addr.s_addr = htonl(INADDR_ANY);
+address.sin_port = htons(PORT);
+if (bind(server_fd,(struct sockaddr *)&address,sizeof(address)) < 0)
+{
+    perror(“bind failed”);
+    return 0;
+}
+
+Fonction listen
+
+#include <sys/socket.h>
+int listen(int socket, int backlog);
+
+Fonction acceptation
+
+int accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
+
+if (listen(server_fd, 3) < 0)
+{
+    perror(“In listen”);
+    exit(EXIT_FAILURE);
+}
+if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+{
+    perror("In accept");
+    exit(EXIT_FAILURE);
+}
+
+READ and WRITE d'un socket // Il faut utiliser poll a ce moment la
+
+char buffer[1024] = {0};
+int valread = read( new_socket , buffer, 1024);
+printf(“%s\n”,buffer );
+if(valread < 0)
+{
+    printf("No bytes are there to read");
+}
+char *hello = "Hello from the server";//IMPORTANT! WE WILL GET TO IT
+write(new_socket , hello , strlen(hello));
+
+Fermer le socket
+
+close(new_socket);
+
+
+Exemple d echange entre client et server
+
+   The following example illustrates a typical message exchange for a
+   GET request (Section 4.3.1 of [RFC7231]) on the URI
+   "http://www.example.com/hello.txt":
+
+   Client request:
+
+     GET /hello.txt HTTP/1.1
+     User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3
+     Host: www.example.com
+     Accept-Language: en, mi
+
+
+   Server response:
+
+     HTTP/1.1 200 OK
+     Date: Mon, 27 Jul 2009 12:28:53 GMT
+     Server: Apache
+     Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT
+     ETag: "34aa387-d-1568eb00"
+     Accept-Ranges: bytes
+     Content-Length: 51
+     Vary: Accept-Encoding
+     Content-Type: text/plain
+
+     Hello World! My payload includes a trailing CRLF.
+
+
+A faire :
+
+Parser le fichier de config
+Creer le serveur a partir du fichier de config
+
+Parser le header + body du client
+
+Répondre au client par le biais d'un CGI ( https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm)
+
+le CGI est un programme que l'on va executer avec EXECVE dans un fork et on redirige le resultat vers le server qui va le rediriger vers le client
+il va se servir des Variables d'environnement pour s'executer parfaitement (soit on les passent par execve, soit on les rajoute directement a l'aide de fonction)
+
+
+TODO Plusieurs sockets doivent etre créer et checker en simultané ?
+
+TODO faire un systeme de socket en a la sauce cpp
+TODO Lire le contenu de Paul et lui faire un retour
