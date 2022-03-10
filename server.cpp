@@ -6,7 +6,7 @@
 /*   By: fmonbeig <fmonbeig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 17:50:15 by fmonbeig          #+#    #+#             */
-/*   Updated: 2022/03/10 17:16:32 by fmonbeig         ###   ########.fr       */
+/*   Updated: 2022/03/10 17:44:13 by fmonbeig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,10 @@ static struct pollfd*	createPollfd(std::vector<Socket*> & socket) //create struc
 		poll->fd = socket[i]->getSocketFd();
 		poll->events = POLLIN;
 	}
+	return (poll);
 }
 
-int main() // faire en sorte de pouvoir creer un nombre de socket illimités
+int main()
 {
 	// Get all the port to listen from Paul's Parsing
 	std::vector<int>	allPort;
@@ -52,12 +53,49 @@ int main() // faire en sorte de pouvoir creer un nombre de socket illimités
 	allPort.push_back(8001);
 	allPort.push_back(8002);
 
-	//Create a containers of Socket pointer
+	//Create a containers of Socket pointer. We initialize the bind and the listening for every Socket
 	std::vector<Socket*>	socket;
 	for(int i = 0; i < allPort.size(); i++)
 		socket.push_back(createSocket(allPort[i]));
 
+	//Create the struct of pollfd for function poll
+	struct pollfd*	poll_fd;
+	int				poll_ret;
+	int				pollin_ok;
+	int				j = 0;
+	poll = createPollfd(socket);
 
+	//Create the loop for Listening all the opening port with poll
+	while (1)
+	{
+		poll_ret = poll(poll_fd, socket.size(), -1); // with negative number poll never time out
+
+		if (poll_ret == 0)
+			std::cout << " Nothing happened // Time out" << std::endl; // probably related to the timeout parameter of poll
+		else
+		{
+			for(int i = 0; j == poll_ret; i++)
+			{
+				pollin_ok = poll_fd[i].revents & POLLIN;
+				if (pollin_ok)
+				{
+					//READ with Accept we can do another function
+					j++;
+				}
+			}
+		}
+	// 	    if (num_events == 0) {
+    //     printf("Poll timed out!\n");
+    // } else {
+    //     int pollin_happened = pfds[0].revents & POLLIN; //TODO understand the BITWISE OPERATION
+
+    //     if (pollin_happened) {
+    //         printf("File descriptor %d is ready to read\n", pfds[0].fd);
+    //     } else {
+    //         printf("Unexpected event occurred: %d\n", pfds[0].revents);
+    //     }
+    // }
+	}
 
 
 
