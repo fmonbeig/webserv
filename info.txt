@@ -111,3 +111,66 @@ TODO Plusieurs sockets doivent etre créer et checker en simultané ?
 
 TODO faire un systeme de socket en a la sauce cpp
 TODO Lire le contenu de Paul et lui faire un retour
+
+
+
+
+
+// Code
+
+	//     int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+// fds is our array of information (which sockets to monitor for what), nfds is the count of elements in the array, and timeout is a timeout in milliseconds. It returns the number of elements in the array that have had an event occur.
+
+// Let’s have a look at that struct:
+
+//     struct pollfd {
+//         int fd;         // the socket descriptor
+//         short events;   // bitmap of events we're interested in
+//         short revents;  // when poll() returns, bitmap of events that occurred
+//     };
+
+
+
+	// 	    if (num_events == 0) {
+    //     printf("Poll timed out!\n");
+    // } else {
+    //     int pollin_happened = pfds[0].revents & POLLIN;
+
+    //     if (pollin_happened) {
+    //         printf("File descriptor %d is ready to read\n", pfds[0].fd);
+    //     } else {
+    //         printf("Unexpected event occurred: %d\n", pfds[0].revents);
+    //     }
+    // }
+	// }
+
+
+
+
+
+
+// 	int new_socket;
+// 	int valread;
+
+// 	std::string hello= "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+
+// 	// regarder du coté de select pour capter les infos de plusieurs socket
+// 	while(1)
+// 	{
+// 		printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+// 		if ((new_socket = accept(socket[0]->getSocketFd(), (struct sockaddr *)&socket[0]->_address, (socklen_t*)&socket[0]->_addrlen))<0)
+// 		{
+// 			perror("In accept");
+// 			exit(EXIT_FAILURE);
+// 		}
+
+// 		char buffer[30000] = {0};
+// 		valread = read( new_socket , buffer, 30000);
+// 		printf("%s\n",buffer );
+
+// 		write(new_socket , hello.c_str() , hello.size());
+// 		printf("------------------Hello message sent-------------------");
+// 		close(new_socket);
+// 	}
+// 	return 0;
+// }
